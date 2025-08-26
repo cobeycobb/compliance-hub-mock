@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance Hub (Mock) - Canvas Organics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="img/logo.png" alt="Canvas Organics Logo" class="logo">
+                    <h1>Canvas Organics</h1>
+                </div>
+                <div class="title-section">
+                    <h2>Compliance Hub (Mock)</h2>
+                    <p class="explainer">Type the BioTrack number printed on your product to view testing and labeling information.</p>
+                    <p class="disclaimer">This is a mock demonstration. Data is placeholder. COA links open dummy PDFs.</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="search-section">
+                <div class="search-bar">
+                    <label for="biotrack-search" class="sr-only">Search by BioTrack number</label>
+                    <input 
+                        type="text" 
+                        id="biotrack-search" 
+                        placeholder="Enter BioTrack number (e.g., BT-000123)"
+                        autocomplete="off"
+                    >
+                    <button type="button" class="clear-btn" id="clear-search" title="Clear search">×</button>
+                </div>
+                <p class="search-helper">Also accepts partial IDs, product name, or strain.</p>
+                <div class="results-count">
+                    <span id="count">20</span> results
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div id="results-container">
+                    <!-- Lot cards will be populated by JavaScript -->
+                </div>
+                <div id="no-results" class="no-results hidden">
+                    <p>No results for "<span id="search-term"></span>". Check your BioTrack number on the label.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact">
+                    <p>Questions? Contact us at <a href="mailto:compliance@canvasorganics.com">compliance@canvasorganics.com</a> or (505) 555-0123</p>
+                </div>
+                <div class="meta">
+                    <p>Last updated: <span id="last-updated"></span></p>
+                    <p>Mock data - No sales or marketing content on this page</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
