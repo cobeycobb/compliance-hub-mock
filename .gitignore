@@ -1,1 +1,6 @@
 .DS_Store
+node_modules/
+debug-*.js
+*.png
+test-*.js
+count-*.js

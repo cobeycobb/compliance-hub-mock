@@ -47,10 +47,10 @@ async function loadLotsData() {
     }
 }
 
-// Simple CSV parser
+// Simple CSV parser with RFC 4180 compliance
 function parseCSV(csvText) {
     const lines = csvText.trim().split('\n');
-    const headers = lines[0].split(',');
+    const headers = parseCSVLine(lines[0]);
     const data = [];
     
     for (let i = 1; i < lines.length; i++) {
@@ -61,32 +61,52 @@ function parseCSV(csvText) {
                 row[header] = values[index];
             });
             data.push(row);
+        } else {
+            console.warn(`Row ${i + 1} has ${values.length} fields but expected ${headers.length}`);
         }
     }
     
     return data;
 }
 
-// Parse a single CSV line (handles quotes and commas)
+// RFC 4180 compliant CSV line parser
 function parseCSVLine(line) {
     const result = [];
-    let current = '';
+    let field = '';
     let inQuotes = false;
+    let i = 0;
     
-    for (let i = 0; i < line.length; i++) {
+    while (i < line.length) {
         const char = line[i];
+        const nextChar = i < line.length - 1 ? line[i + 1] : null;
         
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
+        if (!inQuotes) {
+            if (char === '"') {
+                inQuotes = true;
+            } else if (char === ',') {
+                result.push(field);
+                field = '';
+            } else {
+                field += char;
+            }
         } else {
-            current += char;
+            if (char === '"') {
+                if (nextChar === '"') {
+                    // Escaped quote
+                    field += '"';
+                    i++; // Skip next quote
+                } else {
+                    // End of quoted field
+                    inQuotes = false;
+                }
+            } else {
+                field += char;
+            }
         }
+        i++;
     }
     
-    result.push(current.trim());
+    result.push(field);
     return result;
 }
 
