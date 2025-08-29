@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compliance Hub (Mock) - Canvas Organics</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
     <header>
         <div class="container">
             <div class="header-content">
                 <div class="logo-section">
-                    <img src="img/logo.png" alt="Canvas Organics Logo" class="logo">
-                    <h1>Canvas Organics</h1>
+                    <div class="leading-tight">
+                        <img src="img/CanvasLogo (1).png" alt="Canvas Organics" class="brand-logo" />
+                        <div class="text-xs text-slate-500">Compliance Hub</div>
+                    </div>
                 </div>
                 <div class="title-section">
-                    <h2>Compliance Hub (Mock)</h2>
-                    <p class="explainer">Type the BioTrack number printed on your product to view testing and labeling information.</p>
-                    <p class="disclaimer">This is a mock demonstration. Data is placeholder. COA links open dummy PDFs.</p>
+                    <span class="status">Demo data</span>
                 </div>
             </div>
         </div>
@@ -26,19 +26,25 @@
     <main>
         <div class="container">
             <section class="search-section">
+                <div class="search-header">
+                    <h1>search biotrack number</h1>
+                    <p>to find your product's compliance information</p>
+                </div>
+                <div class="results-count text-xs">
+                    <span id="count">33</span> results (demo)
+                </div>
                 <div class="search-bar">
                     <label for="biotrack-search" class="sr-only">Search by BioTrack number</label>
                     <input 
                         type="text" 
                         id="biotrack-search" 
-                        placeholder="Enter BioTrack number (e.g., BT-000123)"
+                        placeholder='e.g., 1234 5678 9012 3456'
                         autocomplete="off"
                     >
-                    <button type="button" class="clear-btn" id="clear-search" title="Clear search">×</button>
-                </div>
-                <p class="search-helper">Also accepts partial IDs, product name, or strain.</p>
-                <div class="results-count">
-                    <span id="count">20</span> results
+                    <div class="search-buttons">
+                        <button type="button" class="clear-btn" id="clear-search">Clear</button>
+                        <button type="button" class="search-btn">Search</button>
+                    </div>
                 </div>
             </section>
 
@@ -57,7 +63,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="contact">
-                    <p>Questions? Contact us at <a href="mailto:compliance@canvasorganics.com">compliance@canvasorganics.com</a> or (505) 555-0123</p>
+                    <p>Questions? Contact us at <a href="mailto:cobey@truerootsnm.com">cobey@truerootsnm.com</a> or 334-399-1967</p>
                 </div>
                 <div class="meta">
                     <p>Last updated: <span id="last-updated"></span></p>

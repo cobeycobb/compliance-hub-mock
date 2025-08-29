@@ -55,6 +55,12 @@ python3 -m http.server 8000
 # Visit http://localhost:8000
 ```
 
+## Deep Link Search (QR-ready)
+
+- Prefill search from URL params: `?q=BT000118`, `?biotrack=BT000118`, or `?search=Blue+Dream`.
+- Anchor to a specific lot card using the BioTrack ID: `#BT000118` or `#lot-BT000118`.
+- Intended for QR codes printed on packaging to open the page with results in view.
+
 ## GitHub Pages Deployment
 
 1. Push to GitHub repository

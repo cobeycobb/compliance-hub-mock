@@ -9,8 +9,9 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    color: #333;
-    background-color: #f8f9fa;
+    color: #1e293b;
+    background: linear-gradient(to bottom, #f1f5f9, #e0f2fe, #e0e7ff);
+    min-height: 100vh;
 }
 
 .container {
@@ -34,117 +35,205 @@ body {
 
 /* Header */
 header {
-    background: #fff;
-    border-bottom: 2px solid #dee2e6;
-    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 0;
 }
 
 .header-content {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .logo {
-    width: 48px;
-    height: 48px;
-    background: #28a745;
-    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #a7f3d0, #3b82f6);
+    border-radius: 8px;
+    border: 1px solid #6366f1;
     display: block;
 }
 
+/* Brand logo image (replaces the gradient square) */
+.brand-logo {
+    display: block;
+    height: 28px;
+}
+
+@media (min-width: 768px) {
+    .brand-logo {
+        height: 36px;
+    }
+}
+
 .logo-section h1 {
-    font-size: 24px;
+    font-size: 16px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #1e293b;
+    line-height: 1.2;
 }
 
-.title-section h2 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #495057;
-    margin-bottom: 8px;
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #64748b;
 }
 
-.explainer {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 6px;
+.title-section .status {
+    color: #64748b;
 }
 
-.disclaimer {
-    font-size: 14px;
-    color: #dc3545;
-    font-weight: 500;
-    background: #fff5f5;
-    padding: 8px 12px;
-    border-radius: 4px;
-    border-left: 4px solid #dc3545;
+.leading-tight {
+    line-height: 1.2;
+}
+
+.text-xs {
+    font-size: 12px;
+}
+
+.text-slate-500 {
+    color: #64748b;
 }
 
 /* Search section */
 .search-section {
-    background: #fff;
-    padding: 30px 20px;
-    border-radius: 8px;
-    margin: 20px 0;
-    border: 1px solid #dee2e6;
+    position: sticky;
+    /* add desired gap below header directly into top to avoid margin interference */
+    top: calc(var(--header-offset, 56px) + 8px);
+    z-index: 20;
+    /* remove top margin to prevent overlap when sticking */
+    margin: 0 0 8px 0;
+    background: linear-gradient(to right, #1e293b, #334155, #475569);
+    border: 1px solid #64748b;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(100, 116, 139, 0.3) inset;
+}
+
+.search-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* closer title + subtitle */
+    margin-bottom: 8px; /* tighter overall */
+    align-items: center; /* center horizontally */
+    text-align: center;  /* center text */
+}
+
+.search-header h1 {
+    font-size: 28px; /* a little bigger */
+    font-weight: 700; /* a little less bold */
+    letter-spacing: -0.025em;
+    color: #facc15; /* bright amber/yellow */
+    margin: 0;
+    animation: subtle-drift 4.5s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+.search-header p {
+    font-size: 16px; /* slightly bigger */
+    color: #fde68a; /* soft yellow */
+    margin: 0;
+    animation: subtle-drift-2 5.5s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+/* Subtle drift animations for gentle eye-catching motion */
+@keyframes subtle-drift {
+    0%   { transform: translate3d(0, 0, 0); }
+    25%  { transform: translate3d(0.8px, 1px, 0); }
+    50%  { transform: translate3d(1.6px, 0, 0); }
+    75%  { transform: translate3d(0.6px, -0.8px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes subtle-drift-2 {
+    0%   { transform: translate3d(0, 0, 0); }
+    25%  { transform: translate3d(-0.6px, 0.8px, 0); }
+    50%  { transform: translate3d(-1.2px, 0, 0); }
+    75%  { transform: translate3d(-0.4px, -0.5px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .search-header h1,
+    .search-header p {
+        animation: none !important;
+    }
 }
 
 .search-bar {
-    position: relative;
-    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 #biotrack-search {
-    width: 100%;
-    padding: 16px 50px 16px 16px;
-    font-size: 18px;
-    border: 2px solid #007bff;
-    border-radius: 6px;
+    flex: 1;
+    min-width: 256px;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 1px solid #0ea5e9;
+    border-radius: 12px;
     background: #fff;
     outline: none;
     transition: all 0.2s ease;
 }
 
 #biotrack-search:focus {
-    border-color: #0056b3;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    border-color: #0284c7;
+    box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+}
+
+.search-buttons {
+    display: flex;
+    gap: 8px;
 }
 
 .clear-btn {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #6c757d;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #1e293b;
     cursor: pointer;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
     transition: all 0.2s ease;
 }
 
 .clear-btn:hover {
-    background: #f8f9fa;
-    color: #495057;
+    background: #f1f5f9;
 }
 
-.clear-btn:focus {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
+.search-btn {
+    border-radius: 12px;
+    background: #0ea5e9;
+    border: none;
+    color: #fff;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #0284c7;
 }
 
 .search-helper {
@@ -154,33 +243,195 @@ header {
 }
 
 .results-count {
-    font-weight: 600;
-    color: #495057;
-    font-size: 16px;
+    font-size: 12px;
+    color: #cbd5e1;
+    margin: 4px 0 8px 0; /* space above/below search bar */
+}
+
+/* BioTrack chip styling on cards */
+.biotrack-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #e0f2fe; /* sky-100 */
+    border: 1px solid #7dd3fc; /* sky-300 */
+    color: #0c4a6e; /* cyan/sky dark */
+    font-size: 11px;
+}
+
+.biotrack-label {
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-weight: 700;
+    color: #0369a1; /* sky-700 */
+}
+
+.biotrack-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: 700;
+    color: #0c4a6e;
 }
 
 /* Results section */
 .results-section {
     margin-bottom: 40px;
+    margin-top: 16px;
 }
 
 #results-container {
-    display: grid;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Lot cards */
+/* Lot cards - Wide horizontal layout */
 .lot-card {
     background: #fff;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 24px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
 }
 
 .lot-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: #7dd3fc;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Card header row */
+.card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+@media (min-width: 768px) {
+    .card-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+    }
+}
+
+.card-title-section {
+    min-width: 0;
+    flex: 1;
+}
+
+.card-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+}
+
+.badge {
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    padding: 2px 8px;
+    color: #475569;
+    white-space: nowrap;
+}
+
+/* Facts strip */
+.facts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 12px;
+    margin: 4px 0;
+    font-size: 12px;
+    color: #475569;
+}
+
+@media (min-width: 768px) {
+    .facts-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.fact-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.fact-label {
+    color: #64748b;
+}
+
+.fact-value {
+    color: #1e293b;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Potency bubbles */
+.potency-bubbles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+@media (min-width: 768px) {
+    .potency-bubbles {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.potency-bubble {
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.potency-bubble.thc {
+    border: 1px solid #c7d2fe;
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+.potency-bubble.thc .potency-value {
+    color: #1e1b4b;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.potency-bubble.cbd {
+    border: 1px solid #bbf7d0;
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.potency-bubble.cbd .potency-value {
+    color: #064e3b;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.potency-bubble.total {
+    border: 1px solid #a5f3fc;
+    background: #ecfeff;
+    color: #0e7490;
+}
+
+.potency-bubble.total .potency-value {
+    color: #164e63;
+    font-weight: 800;
+    font-size: 16px;
 }
 
 .biotrack-id {

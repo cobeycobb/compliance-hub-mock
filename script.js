@@ -12,11 +12,17 @@ const searchTermSpan = document.getElementById('search-term');
 const lastUpdatedSpan = document.getElementById('last-updated');
 
 // Initialize the app
-document.addEventListener('DOMContentLoaded', function() {
-    loadLotsData();
+document.addEventListener('DOMContentLoaded', async function() {
+    await loadLotsData();
     setupEventListeners();
     setLastUpdated();
+    initFromUrl();
+    updateHeaderOffset();
 });
+
+// Also update after all resources (like images) load and on resize
+window.addEventListener('load', updateHeaderOffset);
+window.addEventListener('resize', updateHeaderOffset);
 
 // Set last updated timestamp
 function setLastUpdated() {
@@ -44,6 +50,32 @@ async function loadLotsData() {
     } catch (error) {
         console.error('Error loading lots data:', error);
         showError('Error loading product data. Please refresh the page.');
+    }
+}
+
+// Initialize search state and focus from URL (for QR/deep links)
+function initFromUrl() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('q') || params.get('biotrack') || params.get('search');
+        if (q) {
+            searchInput.value = q;
+            handleSearch();
+            // Scroll first result into view for convenience
+            const firstCard = resultsContainer.querySelector('.lot-card');
+            if (firstCard) firstCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Support anchors like #BT000118 or #lot-BT000118
+        if (window.location.hash) {
+            const raw = window.location.hash.replace('#', '');
+            const normalized = raw.replace(/\s+/g, '').toLowerCase();
+            const byId = document.getElementById(raw) || document.getElementById(`lot-${raw}`) ||
+                document.getElementById(`lot-${normalized}`);
+            if (byId) byId.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    } catch (e) {
+        // Non-fatal; ignore URL parsing errors
     }
 }
 
@@ -126,6 +158,18 @@ function setupEventListeners() {
     });
 }
 
+// Compute sticky offset to match header height exactly
+function updateHeaderOffset() {
+    try {
+        const headerEl = document.querySelector('header');
+        if (!headerEl) return;
+        const h = headerEl.offsetHeight;
+        if (h && !Number.isNaN(h)) {
+            document.documentElement.style.setProperty('--header-offset', `${h}px`);
+        }
+    } catch (_) { /* ignore */ }
+}
+
 // Handle search input
 function handleSearch() {
     const searchTerm = searchInput.value.trim().toLowerCase();
@@ -134,16 +178,20 @@ function handleSearch() {
         filteredData = [...lotsData];
     } else {
         filteredData = lotsData.filter(lot => {
-            // Search in BioTrack ID (remove hyphens for matching)
-            const biotrackMatch = lot.BioTrack_ID.toLowerCase().replace(/-/g, '').includes(searchTerm.replace(/-/g, ''));
+            // Search in BioTrack ID (remove spaces and hyphens for matching)
+            const bioTrackId = (lot.BioTrackID || '').toLowerCase().replace(/[\s-]/g, '');
+            const biotrackMatch = bioTrackId.includes(searchTerm.replace(/[\s-]/g, ''));
             
-            // Search in product name
-            const productMatch = lot.Product_Name.toLowerCase().includes(searchTerm);
+            // Search in product name (main product name)
+            const productMatch = (lot.Product || '').toLowerCase().includes(searchTerm);
             
             // Search in strain
-            const strainMatch = lot.Strain.toLowerCase().includes(searchTerm);
+            const strainMatch = (lot.Strain || '').toLowerCase().includes(searchTerm);
             
-            return biotrackMatch || productMatch || strainMatch;
+            // Search in manufacturer
+            const manufacturerMatch = (lot['manufactured by'] || '').toLowerCase().includes(searchTerm);
+            
+            return biotrackMatch || productMatch || strainMatch || manufacturerMatch;
         });
     }
     
@@ -174,155 +222,145 @@ function displayResults() {
     });
 }
 
-// Create a lot card element
+// Create a lot card element  
 function createLotCard(lot) {
-    const card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'lot-card';
     
+    // New CSV format uses: Product, Type, Strain, BioTrackID, TotalTHC, TotalCBD, TotalCannabinoids, PdfUrl
+    const productName = lot.Product || 'Item';  // Main product name from Product column
+    const strain = lot.Strain || '-';
+    const productType = lot.Type || '';
+    const bioTrackId = lot.BioTrackID || '';
+    const packageDate = lot['package date'] || '';
+    // Assign a stable id to support anchors and deep links
+    const safeId = String(bioTrackId).toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9_-]/g, '');
+    if (safeId) card.id = `lot-${safeId}`;
+    
     card.innerHTML = `
-        <div class="biotrack-id">${lot.BioTrack_ID}</div>
-        
-        <div class="product-info">
-            <div class="product-name">${lot.Product_Name}</div>
-            <div>
-                <span class="product-type">${lot.Product_Type}</span>
-                ${lot.Strain && lot.Strain !== 'N/A' ? `<span class="strain">${lot.Strain}</span>` : ''}
+        <!-- Header with View COA button and large product name -->
+        <div class="card-header-new" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <div style="flex: 1;">
+                <h2 class="product-name-large" style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; line-height: 1.2;">${productName}</h2>
+                <div style="margin-top: 2px; font-size: 12px; color: #64748b;">${strain}${productType ? ` • ${productType}` : ''}</div>
+                ${bioTrackId ? `<div class="biotrack-chip" aria-label="BioTrack number" style="margin-top: 4px;"><span class="biotrack-label">BioTrack number:</span><span class="biotrack-code">${bioTrackId}</span></div>` : ''}
+            </div>
+            <div style="margin-left: 12px;">
+                ${lot.PdfUrl ? `
+                <a href="${lot.PdfUrl}" target="_blank" rel="noopener noreferrer" 
+                   style="display: inline-block; border-radius: 8px; background: #10b981; color: #fff; padding: 8px 16px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"
+                   onmouseover="this.style.background='#059669'" onmouseout="this.style.background='#10b981'">View COA</a>
+                ` : `
+                <button style="display: inline-block; border-radius: 8px; background: #d1d5db; color: #6b7280; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: default; opacity: 0.6;" disabled>No COA</button>
+                `}
             </div>
         </div>
+
+        ${createPotencyBubbles(lot)}
         
-        <div class="field-grid">
-            <div class="field">
-                <div class="field-label">Net Contents</div>
-                <div class="field-value">${lot.Net_Contents}${lot.Servings ? ` (${lot.Servings} servings)` : ''}</div>
-            </div>
-            
-            <div class="field">
-                <div class="field-label">Manufacturer</div>
-                <div class="field-value">${lot.Manufacturer}<br>License #${lot.License_Number}<br>${lot.Business_City}</div>
-            </div>
+        <!-- Facts strip -->
+        <div class="facts-grid">
+            ${lot['Manufacture date'] ? `
+            <div class="fact-item">
+                <span class="fact-label">Manufactured</span>
+                <span class="fact-value">${formatDate(lot['Manufacture date'])}</span>
+            </div>` : ''}
+            ${packageDate ? `
+            <div class="fact-item">
+                <span class="fact-label">Packaged</span>
+                <span class="fact-value">${formatDate(packageDate)}</span>
+            </div>` : ''}
+            ${lot['Testing lab'] ? `
+            <div class="fact-item">
+                <span class="fact-label">Lab</span>
+                <span class="fact-value">${lot['Testing lab']}</span>
+            </div>` : ''}
+            ${lot['manufactured by'] ? `
+            <div class="fact-item">
+                <span class="fact-label">Manufacturer</span>
+                <span class="fact-value">${lot['manufactured by']}</span>
+            </div>` : ''}
         </div>
         
-        ${createPotencySection(lot)}
-        
-        <div class="field-grid">
-            <div class="field">
-                <div class="field-label">Lab</div>
-                <div class="field-value">${lot.Lab_Name}${lot.Lab_ID ? ` (${lot.Lab_ID})` : ''}</div>
-            </div>
-            
-            <div class="field">
-                <div class="field-label">Dates</div>
-                <div class="field-value">
-                    ${lot.Product_Type === 'Flower' && lot.Harvest_Date ? `Harvest: ${formatDate(lot.Harvest_Date)}<br>` : ''}
-                    Mfg: ${formatDate(lot.Manufacturing_Date)}<br>
-                    Pack: ${formatDate(lot.Pack_Date)}<br>
-                    ${lot.Best_By_Date ? `Best by: ${formatDate(lot.Best_By_Date)}<br>` : ''}
-                    COA Sample: ${formatDate(lot.COA_Sample_Date)}
-                </div>
-            </div>
-        </div>
-        
-        ${lot.Ingredients ? `
-        <div class="field">
-            <div class="field-label">Ingredients</div>
-            <div class="field-value">${lot.Ingredients}</div>
-        </div>
-        ` : ''}
-        
-        ${lot.Allergens ? `
-        <div class="field">
-            <div class="field-label">Allergens</div>
-            <div class="field-value">${lot.Allergens}</div>
-        </div>
-        ` : ''}
-        
-        ${lot.Nutrition ? `
-        <div class="field">
-            <div class="field-label">Nutrition Information</div>
-            <div class="field-value">${lot.Nutrition}</div>
-        </div>
-        ` : ''}
-        
-        <div class="warnings">
-            <div class="field-label">Warnings</div>
-            <div class="field-value">${lot.Warnings}</div>
-        </div>
-        
-        <a href="coas/${lot.COA_Filename}" class="coa-link" target="_blank" rel="noopener noreferrer">
-            View COA (PDF)
-        </a>
-        
-        <div class="metadata">
-            COA ID: ${lot.COA_Filename} | Last updated: ${formatDate(lot.Last_Updated)}
+        <!-- Extra fields grid showing compliance details -->
+        <div class="extra-fields-grid" style="margin-top: 8px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+            ${createExtraField('Type', lot.Type)}
+            ${createExtraField('Expiration Date', formatDate(lot['expiration date']))}
+            ${createExtraField('Grown By', lot['Grown by'])}
+            ${createExtraField('Pesticides Used', lot['Pesticides used'])}
+            ${createExtraField('Solvents Used', lot['solvents used'])}
+            ${createExtraField('Intended Use', lot['intended use'])}
+            ${createExtraField('Warning 1', lot['warning 1'])}
+            ${createExtraField('Warning 2', lot['warning 2'])}
+            ${createExtraField('Poison Control', lot['poison control'] || lot['poison contorl'])}
         </div>
     `;
     
     return card;
 }
 
-// Create potency section based on product type
-function createPotencySection(lot) {
-    if (lot.Product_Type === 'Edible' || lot.Product_Type === 'Topical') {
-        // Show mg/serving and mg/package for edibles and topicals
+// Helper function to create extra field items
+function createExtraField(label, value, type = 'text') {
+    if (!value || value === '-' || value === 'None') return '';
+    
+    if (type === 'link' && value.startsWith('http')) {
         return `
-        <div class="potency-grid">
-            ${lot.THC_mg_serving ? `
-            <div class="potency-item">
-                <div class="potency-label">THC</div>
-                <div class="potency-value">${lot.THC_mg_serving}mg/srv<br>${lot.THC_mg_package}mg/pkg</div>
+            <div style="border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 6px; font-size: 11px;">
+                <div style="color: #64748b; font-weight: 500; margin-bottom: 1px;">${label}</div>
+                <a href="${value}" target="_blank" rel="noopener noreferrer" style="color: #0ea5e9; text-decoration: underline; word-break: break-all;">Open COA</a>
             </div>
-            ` : ''}
-            ${lot.CBD_mg_serving ? `
-            <div class="potency-item">
-                <div class="potency-label">CBD</div>
-                <div class="potency-value">${lot.CBD_mg_serving}mg/srv<br>${lot.CBD_mg_package}mg/pkg</div>
-            </div>
-            ` : ''}
-            ${lot.Total_Cannabinoids && lot.Product_Type === 'Topical' ? `
-            <div class="potency-item">
-                <div class="potency-label">Total</div>
-                <div class="potency-value">${lot.Total_Cannabinoids}</div>
-            </div>
-            ` : ''}
-        </div>
-        `;
-    } else {
-        // Show percentages for flower, pre-rolls, and concentrates
-        return `
-        <div class="potency-grid">
-            ${lot.THC_Percent ? `
-            <div class="potency-item">
-                <div class="potency-label">THC</div>
-                <div class="potency-value">${lot.THC_Percent}%</div>
-            </div>
-            ` : ''}
-            ${lot.THCa_Percent ? `
-            <div class="potency-item">
-                <div class="potency-label">THCa</div>
-                <div class="potency-value">${lot.THCa_Percent}%</div>
-            </div>
-            ` : ''}
-            ${lot.CBD_Percent ? `
-            <div class="potency-item">
-                <div class="potency-label">CBD</div>
-                <div class="potency-value">${lot.CBD_Percent}%</div>
-            </div>
-            ` : ''}
-            ${lot.CBDa_Percent ? `
-            <div class="potency-item">
-                <div class="potency-label">CBDa</div>
-                <div class="potency-value">${lot.CBDa_Percent}%</div>
-            </div>
-            ` : ''}
-            ${lot.Total_Cannabinoids ? `
-            <div class="potency-item">
-                <div class="potency-label">Total</div>
-                <div class="potency-value">${lot.Total_Cannabinoids}%</div>
-            </div>
-            ` : ''}
-        </div>
         `;
     }
+    
+    return `
+        <div style="border-radius: 6px; border: 1px solid #e2e8f0; background: #f8fafc; padding: 6px; font-size: 11px;">
+            <div style="color: #64748b; font-weight: 500; margin-bottom: 1px;">${label}</div>
+            <div style="color: #1e293b; white-space: pre-wrap; word-break: break-words; line-height: 1.2;">${String(value || '-')}</div>
+        </div>
+    `;
+}
+
+// Create potency bubbles based on new CSV format
+function createPotencyBubbles(lot) {
+    const bubbles = [];
+    
+    // New CSV format uses: TotalTHC, TotalCBD, TotalCannabinoids
+    if (lot.TotalTHC) {
+        bubbles.push(`
+            <div class="potency-bubble thc">
+                <span>THC Total</span>
+                <span class="potency-value">${lot.TotalTHC}</span>
+            </div>
+        `);
+    }
+    
+    if (lot.TotalCBD) {
+        bubbles.push(`
+            <div class="potency-bubble cbd">
+                <span>CBD Total</span>
+                <span class="potency-value">${lot.TotalCBD}</span>
+            </div>
+        `);
+    }
+    
+    if (lot.TotalCannabinoids) {
+        bubbles.push(`
+            <div class="potency-bubble total">
+                <span>Total Cannabinoids</span>
+                <span class="potency-value">${lot.TotalCannabinoids}</span>
+            </div>
+        `);
+    }
+    
+    if (bubbles.length === 0) {
+        return '';
+    }
+    
+    return `
+        <div class="potency-bubbles">
+            ${bubbles.join('')}
+        </div>
+    `;
 }
 
 // Format date string
