@@ -240,12 +240,12 @@ function createLotCard(lot) {
     card.innerHTML = `
         <!-- Header with View COA button and large product name -->
         <div class="card-header-new" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <div style="flex: 1;">
+            <div class="card-header-left" style="flex: 1;">
                 <h2 class="product-name-large" style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; line-height: 1.2;">${productName}</h2>
                 <div style="margin-top: 2px; font-size: 12px; color: #64748b;">${strain}${productType ? ` • ${productType}` : ''}</div>
                 ${bioTrackId ? `<div class="biotrack-chip" aria-label="BioTrack number" style="margin-top: 4px;"><span class="biotrack-label">BioTrack number:</span><span class="biotrack-code">${bioTrackId}</span></div>` : ''}
             </div>
-            <div style="margin-left: 12px;">
+            <div class="coa-actions" style="margin-left: 12px;">
                 ${lot.PdfUrl ? `
                 <a href="${lot.PdfUrl}" target="_blank" rel="noopener noreferrer" 
                    style="display: inline-block; border-radius: 8px; background: #10b981; color: #fff; padding: 8px 16px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"

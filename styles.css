@@ -318,6 +318,33 @@ header {
     transition: all 0.2s ease;
 }
 
+/* Card header layout: allow wrapping so COA button doesn't get squeezed */
+.card-header-new {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.card-header-new .card-header-left {
+    flex: 1 1 240px;
+    min-width: 0; /* allow content to shrink */
+}
+
+.card-header-new .coa-actions {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 520px) {
+    .card-header-new .coa-actions {
+        order: 2;
+        flex-basis: 100%;
+        margin-left: 0 !important; /* override inline margin */
+        margin-top: 6px;
+        display: flex;
+        justify-content: flex-start;
+    }
+}
+
 .lot-card:hover {
     border-color: #7dd3fc;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
