@@ -48,6 +48,15 @@ We built a modern, responsive cannabis compliance lookup website for **Canvas Or
 - Extra field mapping now tolerates CSV header typo: `poison control` vs `poison contorl`
 - Stable element IDs for better accessibility and navigation
 
+### **Phase 6: Header & Search Polish**
+- Centered search heading and subtitle; tuned hierarchy and spacing
+- Switched accent color to yellow, removed glow, added subtle motion with `prefers-reduced-motion` support
+- Moved results count above the search bar to compact the blue search panel
+- Updated placeholder to a 16-digit example: `1234 5678 9012 3456`
+- Replaced text brand with logo image (`img/canvas-logo.png`) and kept “Compliance Hub” label
+- Made search panel stick precisely under header (dynamic header height + margin fix)
+- Added BioTrack chip on cards: labeled "BioTrack number:" with colored badge
+
 ## **Current Data Structure**
 **CSV Fields**: Product, Type, Strain, BioTrackID, TotalTHC, TotalCBD, TotalCannabinoids, PdfUrl, manufactured by, Manufacture date, package date, expiration date, Testing lab, Grown by, Pesticides used, solvents used, intended use, warning 1, warning 2, poison control
 
@@ -75,12 +84,12 @@ We built a modern, responsive cannabis compliance lookup website for **Canvas Or
 
 ## **File Structure**
 ```
-├── index.html          # Main page with cache-busting (v=5)
+├── index.html          # Main page (CSS v=12)
 ├── styles.css          # Comprehensive styling with mobile-first approach
 ├── script.js           # Search logic, CSV parsing, card generation
 ├── data/lots.csv       # 33 cannabis compliance records
 ├── coas/               # PDF certificates of analysis (placeholder)
-├── img/logo.png        # Canvas Organics branding
+├── img/canvas-logo.png # Canvas Organics branding
 └── docs/               # Documentation and screenshots
 ```
 
@@ -90,6 +99,7 @@ We built a modern, responsive cannabis compliance lookup website for **Canvas Or
 - **Browser Support**: Works across all modern browsers
 - **Cache Management**: Version-controlled CSS loading
 - **Local Development**: Python HTTP server ready
+ - **Accessibility**: Respects `prefers-reduced-motion` to disable animations
 
 ## **Deployment Ready**
 - **GitHub Pages compatible**
@@ -101,7 +111,8 @@ We built a modern, responsive cannabis compliance lookup website for **Canvas Or
 - **Live URL**: http://localhost:8000 (when server running)
 - **Cache Refresh**: Use incognito/private browsing for testing
 - **Data Updates**: Simply replace `data/lots.csv` with new compliance data
-- **Styling**: CSS version controlled with `?v=5` parameter
+- **Styling**: CSS cache-busted via `?v=` (current v=12)
+ - **Footer Contact**: Updated to cobey@truerootsnm.com and 334-399-1967
 
 ## **QR/Deep Link Usage**
 - Example QR URL to prefill BioTrack search: `/index.html?q=BT000118`
