@@ -279,6 +279,7 @@ header {
     border: 1px solid #7dd3fc; /* sky-300 */
     color: #0c4a6e; /* cyan/sky dark */
     font-size: 11px;
+    white-space: nowrap; /* prevent wrap on small screens */
 }
 
 .biotrack-label {
@@ -292,6 +293,7 @@ header {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-weight: 700;
     color: #0c4a6e;
+    white-space: nowrap; /* keep groups on one line */
 }
 
 /* Results section */
@@ -392,6 +394,21 @@ header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* On small screens, allow facts to wrap so long values (e.g., Manufacturer)
+   do not overflow horizontally. */
+@media (max-width: 768px) {
+    .fact-item { align-items: flex-start; }
+    .fact-value {
+        white-space: normal;          /* allow line breaks */
+        overflow: visible;            /* show wrapped text */
+        text-overflow: clip;          /* no ellipsis when wrapping */
+        word-break: break-word;       /* break long words if needed */
+        overflow-wrap: anywhere;      /* allow breaks at any point */
+        min-width: 0;                 /* enable flex shrink for text */
+    }
+    .fact-label { white-space: nowrap; }
 }
 
 /* Potency bubbles */
